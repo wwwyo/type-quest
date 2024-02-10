@@ -1,17 +1,23 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TypeChallengeForm } from "./_components/type-challenge-form";
 import { Button } from "@/components/ui/button";
+import { prisma } from "@/lib/prisma";
 
-export default function Page({
+export default async function Page({
   params,
   searchParams,
 }: {
   params: { matchId: string };
-  searchParams: { quest?: string };
+  searchParams: { questId?: string };
 }) {
   const { matchId } = params;
-  const { quest } = searchParams;
-  // get random
+  const { questId } = searchParams;
+
+  // prisma でmatchを取得
+  const match = await prisma.match.findUnique({
+    select: { id: true, status: true },
+    where: { id: +matchId },
+  });
 
   return (
     <div className="grid grid-cols-2">
@@ -21,11 +27,11 @@ export default function Page({
           {["1", "2", "3"].map((id) => (
             <Button
               key={id}
-              variant={quest === id ? "default" : "outline"}
+              variant={questId === id ? "default" : "outline"}
               size="sm"
               asChild
             >
-              <a href={`?quest=${id}`}>{id}</a>
+              <a href={`?questId=${id}`}>{id}</a>
             </Button>
           ))}
         </ul>

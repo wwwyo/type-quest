@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={cn(inter.className, "w-screen")}>
+      <body className={cn(inter.className, "w-svw h-svh")}>
         <header className="w-full h-14 shadow flex items-center px-10">
           <div className="container mx-auto flex items-center">
             <a

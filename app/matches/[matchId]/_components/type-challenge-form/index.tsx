@@ -31,7 +31,7 @@ export const TypeChallengeForm: FC<Props> = (defaultValues) => {
           <p>{state.message}</p>
         </div>
       ) : null}
-      <input type="hidden" name="questionId" id={defaultValues.questionId} />
+      <input type="hidden" name="questionId" value={defaultValues.questionId} />
       <textarea readOnly className="hidden" name="sutCode" value={code} />
       {/* https://www.npmjs.com/package/@monaco-editor/react */}
       <Editor

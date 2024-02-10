@@ -1,3 +1,3 @@
 export default function Page() {
-  return <div>top</div>;
+  return <div>battles</div>;
 }

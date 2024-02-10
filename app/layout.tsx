@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={cn(inter.className, "w-svw h-svh")}>
+      <body className={cn(inter.className, "w-svw h-svh max-h-screen")}>
         <header className="w-full h-14 shadow flex items-center px-10">
           <div className="flex items-center">
             <a
@@ -29,7 +29,7 @@ export default function RootLayout({
             </a>
           </div>
         </header>
-        <main className="mx-auto px-10">{children}</main>
+        <main className="relative h-full w-full px-10">{children}</main>
       </body>
     </html>
   );

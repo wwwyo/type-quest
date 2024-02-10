@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="ja">
       <body className={cn(inter.className, "w-svw h-svh")}>
         <header className="w-full h-14 shadow flex items-center px-10">
-          <div className="container mx-auto flex items-center">
+          <div className="flex items-center">
             <a
               href="/"
               className="bg-green-500 text-white rounded px-2 font-medium"

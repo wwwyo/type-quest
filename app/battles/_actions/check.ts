@@ -1,35 +1,61 @@
 "use server";
 
+import { ServerError, TestError } from "@/lib/errors";
 import { exec } from "child_process";
 import { unlinkSync, writeFileSync } from "fs";
+import { z } from "zod";
+
+const schema = z.object({
+  questionId: z.string(),
+  sutCode: z.string(),
+});
+type Response =
+  | {
+      type: "initial";
+    }
+  | {
+      type: "error";
+      errors: {
+        questionId?: string[] | undefined;
+        sutCode?: string[] | undefined;
+      };
+    }
+  | {
+      type: "failed";
+      message: string;
+    }
+  | {
+      type: "success";
+      message: string;
+    };
 
 /**
  * server actions for the type check
  * @param questionId - 問題番号
  * @param sutCode - ユーザーが提出したコード
  */
-export const checkType = async (formData: FormData) => {
-  const questionId = formData.get("questionId");
-  const sutCode = formData.get("sutCode");
-  if (!validateStr(questionId) || !validateStr(sutCode)) {
-    return { ok: false, error: "Invalid data" };
+export const checkType = async (
+  _: any,
+  formData: FormData
+): Promise<Response> => {
+  const parsedData = schema.safeParse({
+    questionId: formData.get("questionId"),
+    sutCode: formData.get("sutCode"),
+  });
+
+  if (!parsedData.success) {
+    return { type: "error", errors: parsedData.error.flatten().fieldErrors };
   }
 
   // get test code
-  const testCode = await getTestCode(questionId);
-  const result = await evaluateTestCode(sutCode, testCode);
-  return { ok: true, result };
-};
-
-/**
- * string型であることをチェックする
- * @param check
- */
-const validateStr = (check: unknown): check is string => {
-  if (typeof check === "string") {
-    return true;
+  const testCode = await getTestCode(parsedData.data.questionId);
+  const result = await evaluateTestCode(parsedData.data.sutCode, testCode);
+  if (result instanceof TestError) {
+    return { type: "failed", message: result.message };
+  } else if (result instanceof ServerError) {
+    return { type: "error", errors: { sutCode: [result.message] } };
   }
-  return false;
+  return { type: "success", message: result };
 };
 
 /**
@@ -54,18 +80,25 @@ const getTestCode = async (questionId: string): Promise<string> => {
  * @param sutCode - ユーザーが提出したコード
  * @param testCode - テストコード
  */
-const evaluateTestCode = async (sutCode: string, testCode: string) => {
+const evaluateTestCode = async (
+  sutCode: string,
+  testCode: string
+): Promise<string | TestError | ServerError> => {
   // tsdファイルとテストファイルを生成
   const testFileName = generateTempFile("test", `${sutCode}\n${testCode}`);
 
   try {
     // jestを使ってテスト実行
     const testResult = await runCommand(`pnpm jest --silent ${testFileName}`);
-    console.log("Test result:", testResult, "wey");
+    if (testResult !== "") {
+      return new TestError(testResult);
+    }
     return testResult;
   } catch (error) {
-    console.error("Error evaluating TypeScript:", error);
-    return error;
+    const err = new ServerError("Error evaluating TypeScript", {
+      cause: error,
+    });
+    return err;
   } finally {
     // ファイル削除
     deleteFile(testFileName);
@@ -88,13 +121,11 @@ const timeout = 10_000;
 const maxBuffer = 1024 * 500;
 const runCommand = async (command: string): Promise<string> => {
   return new Promise((resolve) => {
-    exec(command, { maxBuffer }, (error, stdout, stderr) => {
-      // なぜか正常な場合もstderrに出力される
+    exec(command, { timeout, maxBuffer }, (error, stdout, stderr) => {
+      // NOTE: 通った場合は何も帰らない, 失敗した場合はエラーメッセージが帰る
       if (error) {
-        console.log("e", error);
         resolve(stderr);
       } else {
-        console.log("std", stdout);
         resolve(stdout);
       }
     });

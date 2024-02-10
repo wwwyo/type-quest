@@ -14,7 +14,7 @@ const buttonVariants = cva(
         destructive:
           "bg-red-500 text-green-50 hover:bg-red-500/90 dark:bg-red-900 dark:text-green-50 dark:hover:bg-red-900/90",
         outline:
-          "border border-green-200 bg-white hover:bg-green-100 hover:text-green-900 dark:border-green-800 dark:bg-green-950 dark:hover:bg-green-800 dark:hover:text-green-50",
+          "border border-green-300 bg-white hover:bg-green-100 hover:text-green-900 dark:border-green-800 dark:bg-green-950 dark:hover:bg-green-800 dark:hover:text-green-50",
         secondary:
           "bg-green-100 text-green-900 hover:bg-green-100/80 dark:bg-green-800 dark:text-green-50 dark:hover:bg-green-800/80",
         ghost:
@@ -25,7 +25,7 @@ const buttonVariants = cva(
         default: "h-10 px-4 py-2",
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
+        icon: "h-9 w-9",
       },
     },
     defaultVariants: {

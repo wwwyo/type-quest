@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 const loadingVariant = cva("inline h-5 w-5 animate-spin", {
   variants: {
     darken: {
-      false: "fill-light-gray text-dark-gray",
-      true: "fill-dark-gray text-border",
+      false: "fill-black/10 text-green-500",
+      true: "fill-green-500 text-black/10",
     },
   },
   defaultVariants: {

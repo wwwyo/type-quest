@@ -12,11 +12,12 @@ datasource db {
 }
 
 model User {
-  id              Int             @id @default(autoincrement())
-  username        String
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  qiitaAccount    QiitaAccount?
+  id           Int           @id @default(autoincrement())
+  username     String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  submissions  Submission[]
+  qiitaAccount QiitaAccount?
 }
 
 model QiitaAccount {
@@ -27,19 +28,19 @@ model QiitaAccount {
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id])
 
-  @@index([userId])
   @@unique([userId])
+  @@index([userId])
 }
 
 model Match {
-  id            Int             @id @default(autoincrement())
-  status        MatchStatus
-  playerOneId   Int
-  playerTwoId   Int
-  winnerId      Int?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  matchDetails  MatchDetail[]
+  id             Int             @id @default(autoincrement())
+  status         MatchStatus
+  playerOneId    Int
+  playerTwoId    Int
+  winnerId       Int?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  matchQuestions MatchQuestion[]
 
   @@index([winnerId])
 }
@@ -49,29 +50,41 @@ enum MatchStatus {
   FINISHED
 }
 
-model MatchDetail {
-  id           Int      @id @default(autoincrement())
-  matchId      Int
-  questionId   Int
-  answeredById Int
-  answer       String
-  isCorrect    Boolean
-  answeredAt   DateTime
-  match        Match    @relation(fields: [matchId], references: [id])
-  question     Question @relation(fields: [questionId], references: [id])
+model MatchQuestion {
+  id          Int          @id @default(autoincrement())
+  matchId     Int
+  questionId  Int
+  createdAt   DateTime     @default(now())
+  match       Match        @relation(fields: [matchId], references: [id])
+  question    Question     @relation(fields: [questionId], references: [id])
+  submissions Submission[]
 
-  @@index([matchId, questionId, answeredById])
+  @@index([matchId, questionId])
+}
+
+model Submission {
+  id              Int           @id @default(autoincrement())
+  matchQuestionId Int
+  userId          Int
+  answer          String
+  isCorrect       Boolean
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  matchQuestion   MatchQuestion @relation(fields: [matchQuestionId], references: [id])
+  user            User          @relation(fields: [userId], references: [id])
+
+  @@index([userId, matchQuestionId])
 }
 
 model Question {
-  id           Int           @id @default(autoincrement())
-  content      String
-  testCode     String
-  hint         String
-  difficulty   Difficulty
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  matchDetails MatchDetail[]
+  id             Int             @id @default(autoincrement())
+  content        String
+  testCode       String
+  hint           String
+  difficulty     Difficulty
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  matchQuestions MatchQuestion[]
 }
 
 enum Difficulty {

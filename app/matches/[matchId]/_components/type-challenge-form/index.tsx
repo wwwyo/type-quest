@@ -4,10 +4,10 @@ import { checkType } from "../../_actions/check";
 import { FC, useState } from "react";
 import { useFormState } from "react-dom";
 import { SubmitButton } from "./submit-button";
-import Editor from '@monaco-editor/react'
+import Editor from "@monaco-editor/react";
 
 type Props = {
-  questionId: string;
+  questionId: number;
   sutCode: string;
 };
 
@@ -32,14 +32,16 @@ export const TypeChallengeForm: FC<Props> = (defaultValues) => {
         </div>
       ) : null}
       <input type="hidden" name="questionId" id={defaultValues.questionId} />
-      <textarea
-        readOnly
-        className="hidden"
-        name="sutCode"
-        value={code}
-      />
+      <textarea readOnly className="hidden" name="sutCode" value={code} />
       {/* https://www.npmjs.com/package/@monaco-editor/react */}
-      <Editor className="rounded-md border-2 border-green-500" height="80vh" width="100%" defaultLanguage="typescript" value={code} onChange={(v) => v && setCode(v)} />
+      <Editor
+        className="rounded-md border-2 border-green-500"
+        height="80vh"
+        width="100%"
+        defaultLanguage="typescript"
+        value={code}
+        onChange={(v) => v && setCode(v)}
+      />
       <SubmitButton />
     </form>
   );

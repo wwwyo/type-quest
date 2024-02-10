@@ -3,6 +3,7 @@ import ReactMarkdown, { ExtraProps } from "react-markdown";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { dracula } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import remarkGfm from "remark-gfm";
+import { getDoc } from "../../_actions/get-doc";
 
 const Pre = ({
   children,
@@ -38,9 +39,10 @@ const Pre = ({
   );
 };
 
-export const QuestionDescriptionMarkdown: React.FC<{ md: string }> = ({
-  md,
-}) => {
+export const QuestionDescriptionMarkdown: React.FC<{
+  questionOriginalId: string;
+}> = async ({ questionOriginalId }) => {
+  const description = await getDoc(questionOriginalId, "description");
   return (
     <ReactMarkdown
       className="markdown whitespace-pre-wrap h-full"
@@ -49,7 +51,7 @@ export const QuestionDescriptionMarkdown: React.FC<{ md: string }> = ({
         pre: Pre,
       }}
     >
-      {md.replace(/\\n/g, "\n")}
+      {description}
     </ReactMarkdown>
   );
 };

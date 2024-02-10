@@ -3,9 +3,10 @@ import { TypeChallengeForm } from "./_components/type-challenge-form";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
 import { QuestionDescriptionMarkdown } from "./_components/question-description-markdown";
-import { getDoc } from "./_actions/get-doc";
+import { getDoc } from "./_fetch/get-doc";
 import { Suspense } from "react";
 import { Loading } from "@/components/ui/loading";
+import { Separator } from "@/components/ui/separator";
 
 export default async function Page({
   params,
@@ -67,19 +68,28 @@ export default async function Page({
           </ul>
         </div>
 
-        <ScrollArea className="h-[80vh] pt-5 grid">
-          {currentQuest ? (
-            <Suspense fallback={<Loading darken />}>
-              <QuestionDescriptionMarkdown
-                questionOriginalId={currentQuest.question.originalId}
-              />
-            </Suspense>
-          ) : (
-            <div className="mt-10">Questを選択してね</div>
-          )}
-
-          {/* タブの下 */}
-        </ScrollArea>
+        <div>
+          <ScrollArea className="h-[35vh] pt-5 grid">
+            {currentQuest ? (
+              <Suspense fallback={<Loading darken />}>
+                <QuestionDescriptionMarkdown
+                  questionOriginalId={currentQuest.question.originalId}
+                />
+              </Suspense>
+            ) : (
+              <div className="mt-10">Questを選択してね</div>
+            )}
+          </ScrollArea>
+          <Separator className="w-full my-10" />
+          <div className="h-full pt-5 grid">
+            <div className="border p-2 rounded-md w-80 flex justify-end">
+              <div className="flex gap-x-1">
+                <span>山田 太郎</span>
+                <span className="green-500">Contribute</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <div className="pt-10">
         {currentQuest ? (

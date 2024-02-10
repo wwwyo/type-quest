@@ -2,6 +2,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { TypeChallengeForm } from "./_components/type-challenge-form";
 import { Button } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
+import { QuestionDescriptionMarkdown } from "./_components/question-description-markdown";
 
 export default async function Page({
   params,
@@ -41,7 +42,7 @@ export default async function Page({
   );
 
   return (
-    <div className="grid grid-cols-2">
+    <div className="grid grid-cols-2 gap-x-5">
       <div>
         {/* タブ */}
         <div className="flex items-center gap-x-3 mt-7">
@@ -63,11 +64,9 @@ export default async function Page({
         <ScrollArea className="h-[80vh] grid">
           <div>
             {currentQuest ? (
-              <div>
-                <h1 className="text-2xl font-bold">
-                  {currentQuest.question.description}
-                </h1>
-              </div>
+              <QuestionDescriptionMarkdown
+                md={currentQuest.question.description}
+              />
             ) : (
               <div className="mt-10">Questを選択してね</div>
             )}

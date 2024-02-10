@@ -114,7 +114,7 @@ const evaluateTestCode = async (
  */
 const generateTempFile = (file_prefix: string, content: string) => {
   const fileName = `${file_prefix}_${crypto.randomUUID()}.test.ts`;
-  const file = path.join(process.cwd(), "files", fileName);
+  const file = process.env.NODE_ENV === 'development' ? fileName : `/tmp/${fileName}`;
   writeFileSync(file, content);
   return file;
 };

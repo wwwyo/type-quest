@@ -43,7 +43,7 @@ export const QuestionDescriptionMarkdown: React.FC<{ md: string }> = ({
 }) => {
   return (
     <ReactMarkdown
-      className="markdown whitespace-pre-wrap"
+      className="markdown whitespace-pre-wrap h-full"
       remarkPlugins={[remarkGfm]}
       components={{
         pre: Pre,

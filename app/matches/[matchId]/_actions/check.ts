@@ -57,6 +57,8 @@ export const checkType = async (
     return { type: "error", errors: { questionId: ["Invalid quest"] } };
   }
 
+  // prisma.submission.create({matchQuet, })
+
   const testCode = await getDoc(question.originalId, "test-code");
   const result = await evaluateTestCode(parsedData.data.sutCode, testCode);
   if (result instanceof TestError) {

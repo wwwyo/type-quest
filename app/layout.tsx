@@ -23,13 +23,13 @@ export default function RootLayout({
           <div className="container mx-auto flex items-center">
             <a
               href="/"
-              className="bg-green-500 text-white rounded py-px px-2 font-medium"
+              className="bg-green-500 text-white rounded px-2 font-medium"
             >
               Type Quest
             </a>
           </div>
         </header>
-        <main className="mx-auto pt-10 pl-10">{children}</main>
+        <main className="mx-auto pt-10 px-10">{children}</main>
       </body>
     </html>
   );

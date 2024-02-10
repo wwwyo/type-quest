@@ -3,7 +3,6 @@
 import { ServerError, TestError } from "@/lib/errors";
 import { exec } from "child_process";
 import { unlinkSync, writeFileSync } from "fs";
-import path from "path";
 import { z } from "zod";
 
 const schema = z.object({
@@ -90,7 +89,7 @@ const evaluateTestCode = async (
 
   try {
     // jestを使ってテスト実行
-    const testResult = await runCommand(`pnpm jest --silent ${testFile}`);
+    const testResult = await runCommand(`npx jest --silent ${testFile}`);
     if (testResult !== "") {
       return new TestError(testResult);
     }
@@ -114,7 +113,9 @@ const evaluateTestCode = async (
  */
 const generateTempFile = (file_prefix: string, content: string) => {
   const fileName = `${file_prefix}_${crypto.randomUUID()}.test.ts`;
-  const file = process.env.NODE_ENV === 'development' ? fileName : `/tmp/${fileName}`;
+  // https://vercel.com/guides/how-can-i-use-files-in-serverless-functions#using-temporary-storage
+  const file =
+    process.env.NODE_ENV === "development" ? fileName : `/tmp/${fileName}`;
   writeFileSync(file, content);
   return file;
 };

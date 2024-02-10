@@ -1,9 +1,11 @@
 "use server";
 
 import { ServerError, TestError } from "@/lib/errors";
-import { exec } from "child_process";
 import { unlinkSync, writeFileSync } from "fs";
 import { z } from "zod";
+import { getDoc } from "../_fetch/get-doc";
+import { prisma } from "@/lib/prisma";
+import { compileAndCheck } from "./exec";
 
 const schema = z.object({
   questionId: z.string(),
@@ -47,8 +49,15 @@ export const checkType = async (
     return { type: "error", errors: parsedData.error.flatten().fieldErrors };
   }
 
-  // get test code
-  const testCode = await getTestCode(parsedData.data.questionId);
+  const question = await prisma.question.findUnique({
+    select: { id: true, originalId: true },
+    where: { id: +parsedData.data.questionId },
+  });
+  if (!question) {
+    return { type: "error", errors: { questionId: ["Invalid quest"] } };
+  }
+
+  const testCode = await getDoc(question.originalId, "test-code");
   const result = await evaluateTestCode(parsedData.data.sutCode, testCode);
   if (result instanceof TestError) {
     return { type: "failed", message: result.message };
@@ -56,23 +65,6 @@ export const checkType = async (
     return { type: "error", errors: { sutCode: [result.message] } };
   }
   return { type: "success", message: result };
-};
-
-/**
- * test codeを取得
- * @param questionId - 問題番号
- */
-const getTestCode = async (questionId: string): Promise<string> => {
-  return `
-  import { expectType } from "tsd";
-  describe("Check type definitions", () => {
-    it("Condition", () => {
-      let animal: Condition<"kuma", "inu" | "neko">;
-
-      expectType<unknown>(animal);
-    });
-  });
-  `;
 };
 
 /**
@@ -85,15 +77,16 @@ const evaluateTestCode = async (
   testCode: string
 ): Promise<string | TestError | ServerError> => {
   // tsdファイルとテストファイルを生成
-  const testFile = generateTempFile("test", `${sutCode}\n${testCode}`);
+  const testFile = generateTempFile("test", `${testCode}\n${sutCode}`);
 
   try {
     // jestを使ってテスト実行
-    const testResult = await runCommand(`npx jest --silent ${testFile}`);
-    if (testResult !== "") {
-      return new TestError(testResult);
+    // const testResult = await runCommand(`npx jest --silent ${testFile}`);
+    const testResult = compileAndCheck(testFile);
+    if (testResult !== undefined) {
+      return new TestError(testResult.join("\n"));
     }
-    return testResult;
+    return "ok";
   } catch (error) {
     const err = new ServerError("Error evaluating TypeScript", {
       cause: error,
@@ -120,20 +113,20 @@ const generateTempFile = (file_prefix: string, content: string) => {
   return file;
 };
 
-const timeout = 10_000;
-const maxBuffer = 1024 * 500;
-const runCommand = async (command: string): Promise<string> => {
-  return new Promise((resolve) => {
-    exec(command, { timeout, maxBuffer }, (error, stdout, stderr) => {
-      // NOTE: 通った場合は何も帰らない, 失敗した場合はエラーメッセージが帰る
-      if (error) {
-        resolve(stderr);
-      } else {
-        resolve(stdout);
-      }
-    });
-  });
-};
+// const timeout = 10_000;
+// const maxBuffer = 1024 * 500;
+// const runCommand = async (command: string): Promise<string> => {
+//   return new Promise((resolve) => {
+//     exec(command, { timeout, maxBuffer }, (error, stdout, stderr) => {
+//       // NOTE: 通った場合は何も帰らない, 失敗した場合はエラーメッセージが帰る
+//       if (error) {
+//         resolve(stderr);
+//       } else {
+//         resolve(stdout);
+//       }
+//     });
+//   });
+// };
 
 const deleteFile = (fileName: string) => {
   unlinkSync(fileName);

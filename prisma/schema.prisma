@@ -10,3 +10,72 @@ datasource db {
   url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
+
+model User {
+  id              Int             @id @default(autoincrement())
+  username        String
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  qiitaAccount    QiitaAccount?
+}
+
+model QiitaAccount {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  qiitaId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@unique([userId])
+}
+
+model Match {
+  id            Int             @id @default(autoincrement())
+  status        MatchStatus
+  playerOneId   Int
+  playerTwoId   Int
+  winnerId      Int?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  matchDetails  MatchDetail[]
+
+  @@index([winnerId])
+}
+
+enum MatchStatus {
+  PLAYING
+  FINISHED
+}
+
+model MatchDetail {
+  id           Int      @id @default(autoincrement())
+  matchId      Int
+  questionId   Int
+  answeredById Int
+  answer       String
+  isCorrect    Boolean
+  answeredAt   DateTime
+  match        Match    @relation(fields: [matchId], references: [id])
+  question     Question @relation(fields: [questionId], references: [id])
+
+  @@index([matchId, questionId, answeredById])
+}
+
+model Question {
+  id           Int           @id @default(autoincrement())
+  content      String
+  testCode     String
+  hint         String
+  difficulty   Difficulty
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  matchDetails MatchDetail[]
+}
+
+enum Difficulty {
+  EASY
+  NORMAL
+  HARD
+}

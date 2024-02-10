@@ -78,7 +78,8 @@ model Submission {
 
 model Question {
   id             Int             @id @default(autoincrement())
-  content        String
+  description    String
+  defaultCode    String
   testCode       String
   hint           String
   difficulty     Difficulty

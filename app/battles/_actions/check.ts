@@ -3,6 +3,7 @@
 import { ServerError, TestError } from "@/lib/errors";
 import { exec } from "child_process";
 import { unlinkSync, writeFileSync } from "fs";
+import path from "path";
 import { z } from "zod";
 
 const schema = z.object({
@@ -85,11 +86,11 @@ const evaluateTestCode = async (
   testCode: string
 ): Promise<string | TestError | ServerError> => {
   // tsdファイルとテストファイルを生成
-  const testFileName = generateTempFile("test", `${sutCode}\n${testCode}`);
+  const testFile = generateTempFile("test", `${sutCode}\n${testCode}`);
 
   try {
     // jestを使ってテスト実行
-    const testResult = await runCommand(`pnpm jest --silent ${testFileName}`);
+    const testResult = await runCommand(`pnpm jest --silent ${testFile}`);
     if (testResult !== "") {
       return new TestError(testResult);
     }
@@ -101,7 +102,7 @@ const evaluateTestCode = async (
     return err;
   } finally {
     // ファイル削除
-    deleteFile(testFileName);
+    deleteFile(testFile);
   }
 };
 
@@ -113,8 +114,9 @@ const evaluateTestCode = async (
  */
 const generateTempFile = (file_prefix: string, content: string) => {
   const fileName = `${file_prefix}_${crypto.randomUUID()}.test.ts`;
-  writeFileSync(`${fileName}`, content);
-  return fileName;
+  const file = path.join(process.cwd(), "files", fileName);
+  writeFileSync(file, content);
+  return file;
 };
 
 const timeout = 10_000;

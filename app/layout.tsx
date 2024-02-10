@@ -29,7 +29,7 @@ export default function RootLayout({
             </a>
           </div>
         </header>
-        <main className="mx-auto pt-10 px-10">{children}</main>
+        <main className="mx-auto px-10">{children}</main>
       </body>
     </html>
   );

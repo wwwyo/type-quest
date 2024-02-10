@@ -29,7 +29,7 @@ export default function RootLayout({
             </a>
           </div>
         </header>
-        <main className="relative h-full w-full px-10">{children}</main>
+        <main className="w-full px-10">{children}</main>
       </body>
     </html>
   );

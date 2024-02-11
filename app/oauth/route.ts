@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
   }
 
   const accessToken = await getAccessToken(code);
+  console.log(accessToken);
   if (accessToken === undefined) {
     return notFound();
   }
@@ -25,6 +26,9 @@ export async function GET(req: NextRequest) {
         id: string;
         name: string;
         profile_image_url: string;
+        items_count: number;
+        twitter_screen_name: string;
+        github_login_name: string;
       }>
   );
 
@@ -33,13 +37,15 @@ export async function GET(req: NextRequest) {
       qiitaId: qiita.id,
     },
     update: {
-      name: qiita.name,
+      name: qiita.name || qiita.github_login_name || qiita.twitter_screen_name,
       image: qiita.profile_image_url,
+      itemCount: qiita.items_count,
     },
     create: {
-      name: qiita.name,
+      name: qiita.name || qiita.github_login_name || qiita.twitter_screen_name,
       qiitaId: qiita.id,
       image: qiita.profile_image_url,
+      itemCount: qiita.items_count,
     },
   });
 

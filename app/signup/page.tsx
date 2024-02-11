@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 
 export default function Page() {
-  const oauthUrl = `https://qiita.com/api/v2/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_QIITA_CLIENT_ID}&scope=read_qiita+write_qiita&state=${process.env.NEXT_PUBLIC_QIITA_OAUTH_STATE}`;
+  const oauthUrl = `https://qiita.com/api/v2/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_QIITA_CLIENT_ID}&scope=read_qiita+write_qiita&state=${process.env.QIITA_OAUTH_STATE}`;
   return (
     <>
       <img src="/img/bg.jpg" alt="" className="w-full h-full absolute" />

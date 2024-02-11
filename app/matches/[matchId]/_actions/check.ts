@@ -62,6 +62,7 @@ export const checkType = async (
     select: { id: true, originalId: true },
     where: { id: +parsedData.data.questionId },
   });
+  console.log(+parsedData.data.questionId);
   if (!question) {
     return { type: "error", errors: { questionId: ["Invalid quest"] } };
   }
@@ -80,14 +81,14 @@ export const checkType = async (
 
   await prisma.submission.create({
     data: {
-      matchQuestionId: +parsedData.data.questionId,
+      matchQuestionId: +parsedData.data.matchQuestionId,
       userId: user?.id,
       answer: parsedData.data.sutCode,
       isCorrect: !(result instanceof Error),
     },
   });
 
-  revalidatePath(`/matches/${question.originalId}`);
+  revalidatePath(`/matches/${+parsedData.data.matchId}`);
 
   if (result instanceof TestError) {
     return { type: "failed", message: result.message };
@@ -114,11 +115,10 @@ export const checkType = async (
     where: { id: +parsedData.data.matchId },
   });
 
-  const correctCount = match?.matchQuestions.filter(
-    (q) =>
-      q.submissions.map((sub) => {
-        return sub.userId === user.id && sub.isCorrect;
-      }).length > 0
+  const correctCount = match?.matchQuestions.filter((q) =>
+    q.submissions.some((sub) => {
+      return sub.userId === user.id && sub.isCorrect;
+    })
   ).length;
 
   if (Number(correctCount) >= 2) {

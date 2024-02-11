@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { getQiitaUser } from "@/app/_fetch/get-user";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Check } from "lucide-react";
+import { redirect } from "next/navigation";
 
 export default async function Page({
   params,
@@ -81,6 +82,16 @@ export default async function Page({
       (sub) => sub.userId === user.id && sub.isCorrect
     );
   };
+
+  // isCorrect count
+  const correctCount = match?.matchQuestions.filter((q) =>
+    q.submissions.some((sub) => {
+      return sub.userId === user.id && sub.isCorrect;
+    })
+  ).length;
+  if (Number(correctCount) >= 2) {
+    redirect(`/matches/${+matchId}/result`);
+  }
 
   return (
     <div className="grid grid-cols-2 gap-x-5">
@@ -171,7 +182,7 @@ export default async function Page({
         ) : currentQuest ? (
           <TypeChallengeForm
             matchId={matchId}
-            questionId={currentQuest.id}
+            questionId={currentQuest.question.id}
             matchQuestionId={currentQuest.id}
             sutCode={defaultCode ?? ""}
           />

@@ -6,7 +6,7 @@ export async function GET(req: NextRequest) {
   const state = new URL(req.url).searchParams.get("state");
   const code = new URL(req.url).searchParams.get("code");
 
-  if (state !== process.env.NEXT_PUBLIC_QIITA_OAUTH_STATE || !code) {
+  if (state !== process.env.QIITA_OAUTH_STATE || !code) {
     return new Response("not found", { status: 404 });
   }
 
@@ -37,12 +37,20 @@ export async function GET(req: NextRequest) {
       qiitaId: qiita.id,
     },
     update: {
-      name: qiita.name || qiita.github_login_name || qiita.twitter_screen_name,
+      name:
+        qiita.name ||
+        qiita.github_login_name ||
+        qiita.twitter_screen_name ||
+        "きのこ鍋",
       image: qiita.profile_image_url,
       itemCount: qiita.items_count,
     },
     create: {
-      name: qiita.name || qiita.github_login_name || qiita.twitter_screen_name,
+      name:
+        qiita.name ||
+        qiita.github_login_name ||
+        qiita.twitter_screen_name ||
+        "きのこ鍋",
       qiitaId: qiita.id,
       image: qiita.profile_image_url,
       itemCount: qiita.items_count,

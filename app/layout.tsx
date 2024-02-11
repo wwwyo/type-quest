@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className={cn(inter.className, "w-svw h-svh max-h-screen")}>
-        <header className="w-full h-14 shadow flex items-center px-10">
+        <header className="w-full h-14 shadow flex items-center px-10 justify-between">
           <div className="flex items-center">
             <a
               href="/"
@@ -28,6 +29,10 @@ export default function RootLayout({
               Type Quest
             </a>
           </div>
+
+          <Button variant="outline" size="sm" asChild>
+            <a href="/signout">Sign Out</a>
+          </Button>
         </header>
         <main className="w-full px-10">{children}</main>
       </body>

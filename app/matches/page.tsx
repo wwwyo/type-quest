@@ -1,6 +1,7 @@
 import { Loading } from "@/components/ui/loading";
 
 export default function Page() {
+  console.log(process.env.DATABASE_URL);
   return (
     <div className="text-black relative">
       <div className="absolute inset-0">

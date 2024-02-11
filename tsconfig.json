@@ -12,6 +12,10 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./path/to/@type-challenges/utils/types"
+    ],
     "plugins": [
       {
         "name": "next"

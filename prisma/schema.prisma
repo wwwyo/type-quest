@@ -12,24 +12,13 @@ datasource db {
 }
 
 model User {
-  id           Int           @id @default(autoincrement())
-  username     String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  submissions  Submission[]
-  qiitaAccount QiitaAccount?
-}
-
-model QiitaAccount {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  qiitaId   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
-
-  @@unique([userId])
-  @@index([userId])
+  id          Int          @id @default(autoincrement())
+  qiitaId     String       @unique
+  name        String
+  image       String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  submissions Submission[]
 }
 
 model Match {

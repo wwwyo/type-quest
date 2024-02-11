@@ -1,3 +1,4 @@
+import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -14,7 +15,33 @@ export async function GET(req: NextRequest) {
     return notFound();
   }
 
-  // await
+  const qiita = await fetch("https://qiita.com/api/v2/authenticated_user", {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  }).then(
+    (res) =>
+      res.json() as Promise<{
+        id: string;
+        name: string;
+        profile_image_url: string;
+      }>
+  );
+
+  await prisma.user.upsert({
+    where: {
+      qiitaId: qiita.id,
+    },
+    update: {
+      name: qiita.name,
+      image: qiita.profile_image_url,
+    },
+    create: {
+      name: qiita.name,
+      qiitaId: qiita.id,
+      image: qiita.profile_image_url,
+    },
+  });
 
   // リダイレクト top page
   const response = NextResponse.redirect(new URL("/", req.url));

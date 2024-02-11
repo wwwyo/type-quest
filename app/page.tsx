@@ -4,26 +4,28 @@ import { FC, ReactNode } from "react";
 
 export default function Page() {
   return (
-    <div className="absolute flex flex-col w-80 gap-y-5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-green-50 rounded-md py-5 px-10">
-      <LinkButton>
-        <a href="/matches">
-          <Sword />
-          対戦する
-        </a>
-      </LinkButton>
-      <LinkButton>
-        <a href="/ranking">
-          <Crown />
-          ランキング
-        </a>
-      </LinkButton>
-      <LinkButton>
-        <a href="/histories">
-          <History />
-          履歴
-        </a>
-      </LinkButton>
-    </div>
+    <>
+      <div className="absolute flex flex-col w-80 gap-y-5 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-green-50 rounded-md py-5 px-10">
+        <LinkButton>
+          <a href="/matches">
+            <Sword />
+            対戦する
+          </a>
+        </LinkButton>
+        <LinkButton>
+          <a href="/ranking">
+            <Crown />
+            ランキング
+          </a>
+        </LinkButton>
+        <LinkButton>
+          <a href="/histories">
+            <History />
+            履歴
+          </a>
+        </LinkButton>
+      </div>
+    </>
   );
 }
 

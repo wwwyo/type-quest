@@ -102,7 +102,7 @@ export default async function Page({
           <Separator className="w-full my-10" />
           {/* icon */}
           <div className="h-full pt-5 grid w-full gap-y-5">
-            <div className="border justify-self-end w-fit px-6 py-3 border-green-400 rounded-md flex justify-end gap-x-4 items-center">
+            <div className="border justify-self-end w-fit px-6 py-3  rounded-md flex justify-end gap-x-4 items-center">
               <div className="grid gap-y-1">
                 <span>{enemy?.name}</span>
                 <span className="green-500">投稿数: {enemy?.itemCount}</span>
@@ -134,6 +134,7 @@ export default async function Page({
         {currentQuest ? (
           <TypeChallengeForm
             questionId={currentQuest.id}
+            matchQuestionId={currentQuest.id}
             sutCode={defaultCode ?? ""}
           />
         ) : null}

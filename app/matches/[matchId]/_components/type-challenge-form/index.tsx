@@ -8,6 +8,7 @@ import Editor from "@monaco-editor/react";
 
 type Props = {
   questionId: number;
+  matchQuestionId: number;
   sutCode: string;
 };
 
@@ -31,6 +32,11 @@ export const TypeChallengeForm: FC<Props> = (defaultValues) => {
           <p>{state.message}</p>
         </div>
       ) : null}
+      <input
+        type="hidden"
+        name="matchQuestionId"
+        value={defaultValues.matchQuestionId}
+      />
       <input type="hidden" name="questionId" value={defaultValues.questionId} />
       <textarea readOnly className="hidden" name="sutCode" value={code} />
       {/* https://www.npmjs.com/package/@monaco-editor/react */}

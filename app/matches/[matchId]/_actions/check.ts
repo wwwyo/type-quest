@@ -6,8 +6,11 @@ import { z } from "zod";
 import { getDoc } from "../_fetch/get-doc";
 import { prisma } from "@/lib/prisma";
 import { compileAndCheck } from "./exec";
+import { getQiitaUser } from "@/app/_fetch/get-user";
+import { revalidatePath } from "next/cache";
 
 const schema = z.object({
+  matchQuestionId: z.string(),
   questionId: z.string(),
   sutCode: z.string(),
 });
@@ -41,6 +44,7 @@ export const checkType = async (
   formData: FormData
 ): Promise<Response> => {
   const parsedData = schema.safeParse({
+    matchQuestionId: formData.get("matchQuestionId"),
     questionId: formData.get("questionId"),
     sutCode: formData.get("sutCode"),
   });
@@ -57,10 +61,29 @@ export const checkType = async (
     return { type: "error", errors: { questionId: ["Invalid quest"] } };
   }
 
-  // prisma.submission.create({matchQuet, })
+  const qiita = await getQiitaUser();
+  if (!qiita) {
+    return { type: "error", errors: { questionId: ["Invalid quest"] } };
+  }
+  const user = await prisma.user.findUnique({ where: { qiitaId: qiita.id } });
+  if (!user) {
+    return { type: "error", errors: { questionId: ["Invalid quest"] } };
+  }
 
   const testCode = await getDoc(question.originalId, "test-code");
   const result = await evaluateTestCode(parsedData.data.sutCode, testCode);
+
+  await prisma.submission.create({
+    data: {
+      matchQuestionId: +parsedData.data.questionId,
+      userId: user?.id,
+      answer: parsedData.data.sutCode,
+      isCorrect: !(result instanceof Error),
+    },
+  });
+
+  revalidatePath(`/matches/${question.originalId}`);
+
   if (result instanceof TestError) {
     return { type: "failed", message: result.message };
   } else if (result instanceof ServerError) {

@@ -100,8 +100,9 @@ export default async function Page({
             )}
           </ScrollArea>
           <Separator className="w-full my-10" />
-          <div className="h-full pt-5 grid w-full">
-            <div className="border self-end border-green-300 w-fit px-5 py-3 rounded-md flex justify-end gap-x-4 items-center">
+          {/* icon */}
+          <div className="h-full pt-5 grid w-full gap-y-5">
+            <div className="border justify-self-end w-fit px-5 py-3 rounded-md flex justify-end gap-x-4 items-center">
               <div className="grid gap-y-1">
                 <span>{enemy?.name}</span>
                 <span className="green-500">投稿数: {enemy?.itemCount}</span>
@@ -110,6 +111,10 @@ export default async function Page({
                 <AvatarImage src={enemy?.image} />
                 <AvatarFallback>{enemy?.name}</AvatarFallback>
               </Avatar>
+            </div>
+
+            <div className="w-full border border-black h-40 rounded-md p-10">
+              {enemy?.name}がバトルを仕掛けてきた
             </div>
 
             <div className="border w-fit px-5 py-3 border-green-300 p-2 rounded-md flex gap-x-4 items-center">

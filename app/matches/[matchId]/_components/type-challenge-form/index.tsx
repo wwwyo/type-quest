@@ -5,8 +5,10 @@ import { FC, useState } from "react";
 import { useFormState } from "react-dom";
 import { SubmitButton } from "./submit-button";
 import Editor from "@monaco-editor/react";
+import { useRouter } from "next/navigation";
 
 type Props = {
+  matchId: string;
   questionId: number;
   matchQuestionId: number;
   sutCode: string;
@@ -15,6 +17,13 @@ type Props = {
 export const TypeChallengeForm: FC<Props> = (defaultValues) => {
   const [code, setCode] = useState(defaultValues.sutCode);
   const [state, formAction] = useFormState(checkType, { type: "initial" });
+
+  const router = useRouter();
+
+  if (state.type === "finished") {
+    router.push(`/matches/${defaultValues.matchId}/result`);
+    return "終了";
+  }
 
   return (
     <form action={formAction} className="grid w-full gap-y-5">
@@ -28,10 +37,12 @@ export const TypeChallengeForm: FC<Props> = (defaultValues) => {
           )}
         </div>
       ) : state.type === "failed" ? (
-        <div>
+        <div className="text-red-500">
+          ミス！
           <p>{state.message}</p>
         </div>
       ) : null}
+      <input type="hidden" name="matchId" value={defaultValues.matchId} />
       <input
         type="hidden"
         name="matchQuestionId"

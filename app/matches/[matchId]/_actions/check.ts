@@ -10,6 +10,7 @@ import { getQiitaUser } from "@/app/_fetch/get-user";
 import { revalidatePath } from "next/cache";
 
 const schema = z.object({
+  matchId: z.string(),
   matchQuestionId: z.string(),
   questionId: z.string(),
   sutCode: z.string(),
@@ -32,6 +33,9 @@ type Response =
   | {
       type: "success";
       message: string;
+    }
+  | {
+      type: "finished";
     };
 
 /**
@@ -44,6 +48,7 @@ export const checkType = async (
   formData: FormData
 ): Promise<Response> => {
   const parsedData = schema.safeParse({
+    matchId: formData.get("matchId"),
     matchQuestionId: formData.get("matchQuestionId"),
     questionId: formData.get("questionId"),
     sutCode: formData.get("sutCode"),
@@ -89,7 +94,45 @@ export const checkType = async (
   } else if (result instanceof ServerError) {
     return { type: "error", errors: { sutCode: [result.message] } };
   }
-  return { type: "success", message: result };
+
+  const match = await prisma.match.findUnique({
+    select: {
+      id: true,
+      matchQuestions: {
+        select: {
+          id: true,
+          submissions: {
+            select: {
+              id: true,
+              userId: true,
+              isCorrect: true,
+            },
+          },
+        },
+      },
+    },
+    where: { id: +parsedData.data.matchId },
+  });
+
+  const correctCount = match?.matchQuestions.filter(
+    (q) =>
+      q.submissions.map((sub) => {
+        return sub.userId === user.id && sub.isCorrect;
+      }).length > 0
+  ).length;
+
+  if (Number(correctCount) >= 2) {
+    await prisma.match.update({
+      where: { id: +parsedData.data.matchId },
+      data: {
+        status: "FINISHED",
+        winnerId: user.id,
+      },
+    });
+    return { type: "finished" };
+  } else {
+    return { type: "success", message: result };
+  }
 };
 
 /**

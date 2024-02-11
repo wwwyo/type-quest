@@ -9,6 +9,7 @@ import { Loading } from "@/components/ui/loading";
 import { Separator } from "@/components/ui/separator";
 import { getQiitaUser } from "@/app/_fetch/get-user";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Check } from "lucide-react";
 
 export default async function Page({
   params,
@@ -44,6 +45,13 @@ export default async function Page({
               originalId: true,
             },
           },
+          submissions: {
+            select: {
+              id: true,
+              userId: true,
+              isCorrect: true,
+            },
+          },
         },
       },
     },
@@ -67,6 +75,13 @@ export default async function Page({
     ? await getDoc(currentQuest.question.originalId, "default-code")
     : undefined;
 
+  // 正解済みかチェックする
+  const isCorrect = (matchQuest: { submissions: any[] }) => {
+    return matchQuest.submissions.find(
+      (sub) => sub.userId === user.id && sub.isCorrect
+    );
+  };
+
   return (
     <div className="grid grid-cols-2 gap-x-5">
       <div>
@@ -80,8 +95,12 @@ export default async function Page({
                 variant={isCurrentQuest(quest.id) ? "default" : "outline"}
                 size="icon"
                 asChild
+                disabled={isCorrect(quest)}
               >
-                <a href={`?questId=${quest.id}`}>{idx + 1}</a>
+                <a href={`?questId=${quest.id}`}>
+                  {isCorrect(quest) && <Check width={17} />}
+                  {idx + 1}
+                </a>
               </Button>
             ))}
           </ul>
@@ -113,9 +132,23 @@ export default async function Page({
               </Avatar>
             </div>
 
-            <div className="w-full border border-black h-40 rounded-md p-10">
-              {enemy?.name}がバトルを仕掛けてきた
-            </div>
+            <ScrollArea className="w-full border border-black h-40 rounded-md px-10 grid">
+              <p className="mt-10">{enemy?.name}がバトルを仕掛けてきた</p>
+              <div className="mt-4 grid gap-y-2">
+                {match?.matchQuestions.map((quest, idx) =>
+                  quest.submissions.map((sub) => (
+                    <div key={sub.id} className="flex gap-x-2">
+                      <div>
+                        {sub.userId === user.id ? "自分の提出" : "敵の提出"}:
+                      </div>
+                      <div className="">
+                        {sub.isCorrect ? "正解" : "不正解"}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </ScrollArea>
 
             <div className="border w-fit px-6 py-3 bg-green-400 text-white rounded-md flex gap-x-4 items-center">
               <Avatar>
@@ -131,8 +164,13 @@ export default async function Page({
         </div>
       </div>
       <div className="pt-10">
-        {currentQuest ? (
+        {currentQuest && isCorrect(currentQuest) ? (
+          <div className="border-green-500 rounded-md h-full w-full border">
+            <div className="text-green-500 text-3xl p-10">攻略済み</div>
+          </div>
+        ) : currentQuest ? (
           <TypeChallengeForm
+            matchId={matchId}
             questionId={currentQuest.id}
             matchQuestionId={currentQuest.id}
             sutCode={defaultCode ?? ""}
